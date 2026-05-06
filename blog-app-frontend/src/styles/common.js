@@ -41,7 +41,7 @@ export const navbarClass =
   "bg-white/85 backdrop-blur-xl backdrop-saturate-150 border-b border-[#e8e8ed] px-8 h-[52px] flex items-center sticky top-0 z-50";
 export const navContainerClass = "max-w-5xl mx-auto w-full flex items-center justify-between";
 export const navBrandClass = "text-base font-semibold text-[#1d1d1f] tracking-tight";
-export const navLinksClass = "flex items-center gap-7";
+export const navLinksClass = "flex items-center gap-7 list-none m-0 p-0";
 export const navLinkClass = "text-[0.8rem] text-[#6e6e73] hover:text-[#1d1d1f] transition-colors font-normal";
 export const navLinkActiveClass = "text-[0.8rem] text-[#0066cc] font-medium";
 
