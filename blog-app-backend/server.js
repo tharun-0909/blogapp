@@ -7,12 +7,16 @@ import {adminApp} from './APIs/AdminAPI.js'
 import {commonApp} from './APIs/CommonAPI.js'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 config()
 const app=exp()
 //add cookie parser middleware
 app.use(cookieParser())
-//add cors middleware
 //add cors middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
@@ -20,11 +24,25 @@ app.use(cors({
 }))
 //body parser middleware
 app.use(exp.json())
+
 //path level middlewares
 app.use("/user-api",userApp)
 app.use("/author-api",authorApp)
 app.use("/admin-api",adminApp)
 app.use("/auth",commonApp)
+
+// Serve static files from the React frontend app
+app.use(exp.static(path.join(__dirname, '../blog-app-frontend/dist')))
+
+// Anything that doesn't match the above, send back index.html
+app.get('*', (req, res) => {
+  // Check if it's an API request that failed - if so, don't send index.html
+  if (req.url.startsWith('/user-api') || req.url.startsWith('/author-api') || req.url.startsWith('/admin-api') || req.url.startsWith('/auth')) {
+    return res.status(404).json({message: `path ${req.url} is invalid`})
+  }
+  res.sendFile(path.join(__dirname, '../blog-app-frontend/dist/index.html'))
+})
+
 //connect to db
 const connectDB=async()=>{
     try{
@@ -41,18 +59,10 @@ const connectDB=async()=>{
 
 connectDB()
 
-//to handle invalid path
-app.use((req,res,next)=>{
-    res.status(404).json({message:`path ${req.url} is invalid`})
-})
-
 //Error handling middleware
 app.use((err, req, res, next) => {
   console.log("Error message:", err.message);
   console.log("Error name:", err.name);
-  console.log("Error code:", err.code);
-  console.log("Error cause:", err.cause);
-  console.log("Full error:", JSON.stringify(err, null, 2));
   //ValidationError
   if (err.name === "ValidationError") {
     return res.status(400).json({ message: "error occurred", error: err.message });
