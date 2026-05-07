@@ -45,35 +45,40 @@ commonApp.post("/users",upload.single("profileImageUrl"),async(req,res,next)=>{
 })
 
 //Route for login
-commonApp.post("/login",async(req,res)=>{
-    //get user credentials from body
-    const {email,password}=req.body
-    //verify
-    let user=await UserModel.findOne({email:email})
-    //if email not existed
-    if(!user){
-        return res.status(400).json({message:"Invalid email"})
+commonApp.post("/login",async(req,res,next)=>{
+    try {
+        //get user credentials from body
+        const {email,password}=req.body
+        //verify
+        let user=await UserModel.findOne({email:email})
+        //if email not existed
+        if(!user){
+            return res.status(400).json({message:"Invalid email"})
+        }
+        //compare password
+        const isPasswordValid=await compare(password,user.password)
+        //is password is invalid
+        if(!isPasswordValid){
+            return res.status(400).json({message:"Invalid password"})
+        }
+        //if passwords matched 
+        //create a token
+        const signedToken=sign({id:user._id,email:email,role:user.role},process.env.SECRET_KEY,{expiresIn:"1d"})
+        //set token to res header as httpOnly cookie
+        res.cookie("token",signedToken,{
+            httpOnly:true,
+            sameSite:"none",
+            secure:true
+        })
+        //remove password from the user document
+        const userObj=user.toObject()
+        delete userObj.password
+        //send response
+        res.status(200).json({message:"Login successful",payload:userObj})
+    } catch(err) {
+        console.log("Login error:", err.message);
+        next(err);
     }
-    //compare password
-    const isPasswordValid=await compare(password,user.password)
-    //is password is invalid
-    if(!isPasswordValid){
-        return res.status(400).json({message:"Invalid password"})
-    }
-    //if passwords matched 
-    //create a token
-    const signedToken=sign({id:user._id,email:email,role:user.role},process.env.SECRET_KEY,{expiresIn:"1d"})
-    //set token to res header as httpOnly cookie
-    res.cookie("token",signedToken,{
-        httpOnly:true,
-        sameSite:"none",
-        secure:true
-    })
-    //remove password from the user document
-    const userObj=user.toObject()
-    delete userObj.password
-    //send response
-    res.status(200).json({message:"Login successful",payload:userObj})
 })
 
 //Route for logout
