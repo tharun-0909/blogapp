@@ -1,0 +1,11 @@
+{
+  "name": "blog-app-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root package for Blog App monorepo",
+  "scripts": {
+    "install-backend": "cd blog-app-backend && npm install",
+    "install-frontend": "cd blog-app-frontend && npm install",
+    "build-frontend": "cd blog-app-frontend && npm run build"
+  }
+}

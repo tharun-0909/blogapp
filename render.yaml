@@ -2,7 +2,7 @@ services:
   # Backend Web Service
   - type: web
     name: blog-app-backend
-    env: node
+    runtime: node
     rootDir: blog-app-backend
     buildCommand: npm install
     startCommand: npm start
@@ -12,11 +12,11 @@ services:
       - key: PORT
         value: 10000
       - key: DB_URL
-        sync: false # Set this in Render Dashboard
+        sync: false
       - key: SECRET_KEY
         generateValue: true
       - key: FRONTEND_URL
-        sync: false # Set this to your frontend URL after deployment
+        sync: false
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
@@ -32,9 +32,8 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
-        sync: false # Set this to your backend URL after deployment
+        sync: false
     routes:
-      # This rewrite rule is necessary for React Router to work correctly on reload
       - type: rewrite
         source: /*
         destination: /index.html
