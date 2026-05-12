@@ -6,6 +6,7 @@ export const useAuth = create((set) => ({
   loading: false,
   isAuthenticated: false,
   error: null,
+  isCheckingAuth: false,
   login: async (userCred) => {
     try {
       //set loading true
@@ -55,13 +56,13 @@ export const useAuth = create((set) => ({
   // restore login
   checkAuth: async () => {
     try {
-      set({ loading: true });
+      set({ isCheckingAuth: true });
       const res = await api.get("/auth/check-auth");
 
       set({
         currentUser: res.data.payload,
         isAuthenticated: true,
-        loading: false,
+        isCheckingAuth: false,
       });
     } catch (err) {
       // If user is not logged in or has invalid/old role → clear session
@@ -69,14 +70,14 @@ export const useAuth = create((set) => ({
         set({
           currentUser: null,
           isAuthenticated: false,
-          loading: false,
+          isCheckingAuth: false,
         });
         return;
       }
 
       // other errors
       console.error("Auth check failed:", err);
-      set({ loading: false });
+      set({ isCheckingAuth: false });
     }
   },
 }));

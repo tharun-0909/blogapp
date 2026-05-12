@@ -78,8 +78,8 @@ app.use((err, req, res, next) => {
     const field = Object.keys(keyValue)[0];
     const value = keyValue[field];
     return res.status(409).json({
-      message: "error occurred",
-      error: `${field} "${value}" already exists`,
+      message: `${field === 'email' ? 'Email' : field} "${value}" already exists. Please use a different one.`,
+      error: `${field} already exists`,
     });
   }
 
